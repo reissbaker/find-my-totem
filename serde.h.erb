@@ -1,0 +1,49 @@
+/*
+WARNING: GENERATED CODE
+DO NOT MODIFY
+YOUR MODIFICATIONS WILL BE OVERWRITTEN
+
+Modify serde.h.erb rather than this file.
+If you are currently editing serde.h.erb, and not serde.h, ignore this warning.
+*/
+
+#include <RH_RF95.h>
+#ifndef serde_h
+#define serde_h
+
+struct Packet {
+<% fields.each do |field| %>
+  <%= field.type %> <%= field.name %>;
+<% end %>
+};
+
+uint8_t byteFromLong(long num, int bytePosition) {
+  long mask = 1;
+  for(int i = 0; i < 8; i++) {
+    mask |= (mask << 1) | 1;
+  }
+  mask = mask << (bytePosition * 8);
+
+  long masked = num & mask;
+  return masked >> (bytePosition * 8);
+}
+
+void serialize(uint8_t buf[], Packet packet) {
+  <% bytes_written = 0 %>
+  <% fields.each do |field| %>
+  <% case field.type
+    when :byte %>
+      buf[<%= bytes_written %>] = packet.<%= field.name %>;
+      <% bytes_written += 1 %>
+    <% when :long %>
+      <% 0.upto(3).each do |offset| %>
+        buf[<%= bytes_written + offset %>] = byteFromLong(packet.<%= field.name %>, <%= offset %>);
+      <% end %>
+      <% bytes_written += 4 %>
+    <% else %>
+      <% raise "No known type #{field.type}" %>
+    <% end %>
+  <% end %>
+}
+
+#endif
