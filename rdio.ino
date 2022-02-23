@@ -74,18 +74,17 @@ void loop() {
    * Attempt to receive a packet within a random time
    * -----------------------------------------------------------------------------------------------
    */
-  Serial.print("ID ");
-  Serial.print(randomIdPrefix);
-  Serial.print("-");
-  Serial.println(randomIdSuffix);
+  Serial.print("ID: ");
+  printId(randomIdPrefix, randomIdSuffix);
   Serial.println("Waiting for packets...");
 
   long waitTime = random(WAIT_MS_FLOOR, WAIT_MS_CEIL);
   if(rf95.waitAvailableTimeout(waitTime)) {
-    Serial.println("Received packets");
+    Serial.println("Received packet");
     if(rf95.recv(buf, &len)) {
-      Serial.print("Received byte prefix: ");
-      Serial.println(buf[0]);
+      Packet packet = deserialize(buf);
+      Serial.print("Received ID: ");
+      printId(packet.id_prefix, packet.id_suffix);
 
       Serial.print("RSSI: ");
       Serial.println(rf95.lastRssi(), DEC);
@@ -107,10 +106,17 @@ void loop() {
     .id_suffix = randomIdSuffix,
   };
   serialize(buf, packet);
+  Serial.println("Sending packet...");
   rf95.send(buf, sizeof(packet));
 
   // Wait until packet has sent maybe??
   rf95.waitPacketSent();
+}
+
+void printId(long prefix, long suffix) {
+  Serial.print(prefix);
+  Serial.print("-");
+  Serial.println(suffix);
 }
 
 void blink(int millis) {
@@ -126,22 +132,4 @@ void ledOn() {
 
 void ledOff() {
   digitalWrite(LED_BUILTIN, LOW);
-}
-
-uint8_t byteFromLong(long num, int bytePosition) {
-  long mask = 1;
-  for(int i = 0; i < 8; i++) {
-    mask |= (mask << 1) | 1;
-  }
-  mask = mask << (bytePosition * 8);
-
-  long masked = num & mask;
-  return masked >> (bytePosition * 8);
-}
-long longFromBytes(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
-  long num = 0;
-  num = (num | byte3) << 3;
-  num = (num | byte2) << 2;
-  num = (num | byte1) << 1;
-  return num | byte0;
 }

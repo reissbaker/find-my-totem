@@ -45,7 +45,7 @@ packet = Packet.build do
 end
 
 template = ERB.new(File.read("./serde.h.erb"))
-output = template.result(packet.generate_binding)
+output = template.result(packet.generate_binding).gsub(/\s+$/, '')
 output_dir = Pathname.new("./generated")
 FileUtils.mkdir_p(output_dir)
 output_path = output_dir.join("serde.h")
