@@ -1,5 +1,5 @@
 ## What is this
-This is the Arduino code to make  festival totems that can find each other without needing cell
+This is Arduino code to make  festival totems that can find each other without needing cell
 data service (since that tends to break down at large music festivals). All you need is GPS
 reception and not-overly-crowded 900mhz radio spectrum.
 
