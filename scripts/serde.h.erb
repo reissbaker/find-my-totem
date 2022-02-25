@@ -1,5 +1,25 @@
 #include <RH_RF95.h>
-#include "./serde.h"
+#ifndef serde_h
+#define serde_h
+
+class Packet {
+  public:
+    uint8_t magic_byte;
+
+  <% fields.each do |field| %>
+    <%= field.type %> <%= field.name %>;
+  <% end %>
+};
+
+struct PacketArgs {
+<% fields.each do |field| %>
+  <%= field.type %> <%= field.name %>;
+<% end %>
+};
+
+bool isPacket(uint8_t buf[], int len) {
+  return len == sizeof(struct Packet) && buf[0] == <%= magic_byte %>;
+}
 
 Packet buildPacket(PacketArgs args) {
   return Packet {
@@ -49,10 +69,6 @@ void serialize(uint8_t buf[], Packet packet) {
   <% end %>
 }
 
-bool isPacket(uint8_t buf[], int len) {
-  return len == sizeof(struct Packet) && buf[0] == <%= magic_byte %>;
-}
-
 Packet deserialize(uint8_t buf[]) {
   <% bytes_read = 1 %>
   <% fields.each do |field| %>
@@ -78,3 +94,5 @@ Packet deserialize(uint8_t buf[]) {
     <% end %>
   });
 }
+
+#endif
