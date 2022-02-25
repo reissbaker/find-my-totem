@@ -53,27 +53,26 @@ void Radio::init() {
 bool Radio::receivePacket(long waitTime, Packet *target) {
   uint8_t receivedLen;
 
-  if(rf95.waitAvailableTimeout(waitTime)) {
-    Serial.println("Received packet");
-    if(rf95.recv(buf, &receivedLen)) {
-      Serial.print("RSSI: ");
-      Serial.println(rf95.lastRssi(), DEC);
-
-      if(Packet::isPacket(buf, receivedLen)) {
-        Packet::deserialize(buf, target);
-        return true;
-      }
-
-      Serial.println("Couldn't deserialize packet");
-    }
-    else {
-      Serial.println("recv failed");
-    }
-  }
-  else {
+  if(!rf95.waitAvailableTimeout(waitTime)) {
     Serial.println("No packets received within timeout");
+    return false;
   }
-  return false;
+
+  Serial.print("Received packet with RSSI: ");
+  Serial.println(rf95.lastRssi(), DEC);
+
+  if(!rf95.recv(buf, &receivedLen)) {
+    Serial.println("recv failed");
+    return false;
+  }
+
+  if(!Packet::isPacket(buf, receivedLen)) {
+    Serial.println("Can't deserialize packet");
+    return false;
+  }
+
+  Packet::deserialize(buf, target);
+  return true;
 }
 
 void Radio::sendPacket(Packet &data) {
