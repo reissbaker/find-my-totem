@@ -41,7 +41,16 @@ Line of sight: no
 
 Exactly 3 blocks.
 
+## Feb 21, 2022
+Antennas: Mini 2.5dBi
+Power: 20 (maximum) on transmitter, default on receiver
+Location: Noe Valley
+Line of sight: no
+
+A little over 3 blocks
+
+
 # Thoughts
-I'm not certain there's a meaningful difference between the 2.5dBi antennas and the 5dBi one. That
-being said, I'm curious whether rotating the higher-dBi antenna (or even the low-dBi mini one!)
-could increase range, after reading about what dBi actually means and how antenna range works.
+The mini antennas are just straight up better than the big ones. It appears that pointing them up
+results in the best range, at least on the transmit side... Presumably the 2.5 dBi sacrifices the
+top and bottom in exchange for the sides.
