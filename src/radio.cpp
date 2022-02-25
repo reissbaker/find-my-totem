@@ -56,12 +56,15 @@ bool Radio::receivePacket(long waitTime, Packet *target) {
   if(rf95.waitAvailableTimeout(waitTime)) {
     Serial.println("Received packet");
     if(rf95.recv(buf, &receivedLen)) {
+      Serial.print("RSSI: ");
+      Serial.println(rf95.lastRssi(), DEC);
+
       if(Packet::isPacket(buf, receivedLen)) {
         Packet::deserialize(buf, target);
         return true;
       }
-      Serial.print("RSSI: ");
-      Serial.println(rf95.lastRssi(), DEC);
+
+      Serial.println("Couldn't deserialize packet");
     }
     else {
       Serial.println("recv failed");
