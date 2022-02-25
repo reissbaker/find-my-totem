@@ -32,7 +32,7 @@ end
 
 def generate_cpp(packet)
   name = "serde"
-  output_dir = Pathname.new("../generated")
+  output_dir = Pathname.new("../src/generated")
 
   header_path = Pathname.new("#{name}.h.erb")
   #source_path = Pathname.new("#{name}.cpp.erb")
