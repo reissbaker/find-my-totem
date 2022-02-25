@@ -8,7 +8,7 @@ class LED {
         static void init();
         static void on();
         static void off();
-        static void blink(int millis);
+        static void blinkForever(int milliInterval);
     };
 };
 

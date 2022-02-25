@@ -33,16 +33,12 @@ void Radio::init() {
   // If radio init failed, blink really fast
   if(!rf95.init()) {
     Serial.println("Radio init failed");
-    while(true) {
-      LED::BuiltIn::blink(FAILED_MS);
-    }
+    LED::BuiltIn::blinkForever(FAILED_MS);
   }
 
   if(!rf95.setFrequency(RF95_FREQ)) {
     Serial.println("Frequency setting failed");
-    while(true) {
-      LED::BuiltIn::blink(FAILED_MS);
-    }
+    LED::BuiltIn::blinkForever(FAILED_MS);
   }
   Serial.println(RF95_FREQ);
 

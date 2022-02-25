@@ -13,9 +13,11 @@ void LED::BuiltIn::off() {
   digitalWrite(LED_BUILTIN, LOW);
 }
 
-void LED::BuiltIn::blink(int millis) {
-  LED::BuiltIn::on();
-  delay(millis);
-  LED::BuiltIn::off();
-  delay(millis);
+void LED::BuiltIn::blinkForever(int milliInterval) {
+  while(true) {
+    LED::BuiltIn::on();
+    delay(milliInterval);
+    LED::BuiltIn::off();
+    delay(milliInterval);
+  }
 }
