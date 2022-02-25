@@ -35,11 +35,11 @@ def generate_cpp(packet)
   output_dir = Pathname.new("../src/generated")
 
   header_path = Pathname.new("#{name}.h.erb")
-  #source_path = Pathname.new("#{name}.cpp.erb")
+  source_path = Pathname.new("#{name}.cpp.erb")
 
   FileUtils.mkdir_p(output_dir)
   header_output_path = output_dir.join("#{name}.h")
-  #source_output_path = output_dir.join("#{name}.cpp")
+  source_output_path = output_dir.join("#{name}.cpp")
   generate_from_template(packet, header_path, header_output_path)
-  #generate_from_template(packet, source_path, source_output_path)
+  generate_from_template(packet, source_path, source_output_path)
 end

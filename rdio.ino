@@ -1,5 +1,5 @@
 #include <RH_RF95.h>
-#include "./generated/serde.h"
+#include "./src/generated/serde.h"
 
 #define RFM95_CS 8
 #define RFM95_RST 4
