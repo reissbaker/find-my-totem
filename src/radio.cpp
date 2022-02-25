@@ -15,6 +15,8 @@
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 // Singleton data buffer used by the radio driver
+// Space/time tradeoff: by storing this here we avoid allocating this on every radio interaction,
+// but pay a static cost in RAM to constantly maintain this buffer.
 uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 
 void Radio::init() {
