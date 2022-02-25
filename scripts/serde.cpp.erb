@@ -1,17 +1,16 @@
 #include <RH_RF95.h>
 #include "./serde.h"
 
-bool isPacket(uint8_t buf[], int len) {
+bool Packet::isPacket(uint8_t buf[], int len) {
   return len == sizeof(struct Packet) && buf[0] == <%= magic_byte %>;
 }
 
-Packet buildPacket(PacketArgs args) {
-  return Packet {
-    .magic_byte = <%= magic_byte %>,
-    <% fields.each_with_index do |field, index| %>
-      .<%= field.name %> = args.<%= field.name %> <% if index != fields.length - 1 %>,<% end %>
-    <% end %>
-  };
+Packet::Packet(PacketArgs args) {
+  this->magic_byte = <%= magic_byte %>;
+
+  <% fields.each_with_index do |field, index| %>
+    this-><%= field.name %> = args.<%= field.name %>;
+  <% end %>
 }
 
 uint8_t byteFromLong(long num, int bytePosition) {
@@ -33,18 +32,18 @@ long longFromBytes(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
   return num | byte0;
 }
 
-void serialize(uint8_t buf[], Packet packet) {
+void Packet::serialize(uint8_t buf[]) {
   buf[0] = <%= magic_byte %>;
 
   <% bytes_written = 1 %>
   <% fields.each do |field| %>
   <% case field.type
     when :byte %>
-      buf[<%= bytes_written %>] = packet.<%= field.name %>;
+      buf[<%= bytes_written %>] = this-><%= field.name %>;
       <% bytes_written += 1 %>
     <% when :long %>
       <% 0.upto(3).each do |offset| %>
-        buf[<%= bytes_written + offset %>] = byteFromLong(packet.<%= field.name %>, <%= offset %>);
+        buf[<%= bytes_written + offset %>] = byteFromLong(this-><%= field.name %>, <%= offset %>);
       <% end %>
       <% bytes_written += 4 %>
     <% else %>
@@ -53,7 +52,7 @@ void serialize(uint8_t buf[], Packet packet) {
   <% end %>
 }
 
-Packet deserialize(uint8_t buf[]) {
+Packet Packet::deserialize(uint8_t buf[]) {
   <% bytes_read = 1 %>
   <% fields.each do |field| %>
   <% case field.type
@@ -72,7 +71,7 @@ Packet deserialize(uint8_t buf[]) {
     <% end %>
   <% end %>
 
-  return buildPacket(PacketArgs {
+  return Packet(PacketArgs {
     <% fields.each_with_index do |field, index| %>
       .<%= field.name %> = <%= field.name %> <% if index != fields.length - 1 %>,<% end %>
     <% end %>

@@ -2,6 +2,12 @@
 #ifndef serde_h
 #define serde_h
 
+struct PacketArgs {
+<% fields.each do |field| %>
+  <%= field.type %> <%= field.name %>;
+<% end %>
+};
+
 class Packet {
   public:
     uint8_t magic_byte;
@@ -9,21 +15,14 @@ class Packet {
   <% fields.each do |field| %>
     <%= field.type %> <%= field.name %>;
   <% end %>
+
+  Packet(PacketArgs args);
+
+  static bool isPacket(uint8_t buf[], int len);
+  static Packet deserialize(uint8_t buf[]);
+
+  void serialize(uint8_t buf[]);
 };
 
-struct PacketArgs {
-<% fields.each do |field| %>
-  <%= field.type %> <%= field.name %>;
-<% end %>
-};
-
-bool isPacket(uint8_t buf[], int len);
-Packet buildPacket(PacketArgs args);
-
-uint8_t byteFromLong(long num, int bytePosition);
-long longFromBytes(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3);
-
-void serialize(uint8_t buf[], Packet packet);
-Packet deserialize(uint8_t buf[]);
 
 #endif

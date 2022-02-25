@@ -82,8 +82,8 @@ void loop() {
   if(rf95.waitAvailableTimeout(waitTime)) {
     Serial.println("Received packet");
     if(rf95.recv(buf, &len)) {
-      if(isPacket(buf, len)) {
-        Packet packet = deserialize(buf);
+      if(Packet::isPacket(buf, len)) {
+        Packet packet = Packet::deserialize(buf);
         Serial.print("Received ID: ");
         printId(packet.id_prefix, packet.id_suffix);
       }
@@ -106,11 +106,11 @@ void loop() {
    * Send a packet
    * -----------------------------------------------------------------------------------------------
    */
-  Packet packet = buildPacket(PacketArgs {
+  Packet packet = Packet(PacketArgs {
     .id_prefix = randomIdPrefix,
     .id_suffix = randomIdSuffix,
   });
-  serialize(buf, packet);
+  packet.serialize(buf);
   Serial.println("Sending packet...");
   rf95.send(buf, sizeof(packet));
 
