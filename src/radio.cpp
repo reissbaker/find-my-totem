@@ -17,7 +17,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 // Singleton data buffer used by the radio driver
 // Space/time tradeoff: by storing this here we avoid allocating this on every radio interaction,
 // but pay a static cost in RAM to constantly maintain this buffer.
-uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+uint8_t rf_buf[RH_RF95_MAX_MESSAGE_LEN];
 
 void Radio::init() {
   pinMode(RFM95_RST, OUTPUT);
@@ -57,23 +57,23 @@ bool Radio::receivePacket(long waitTime, Packet *target) {
   Serial.print("Received packet with RSSI: ");
   Serial.println(rf95.lastRssi(), DEC);
 
-  if(!rf95.recv(buf, &receivedLen)) {
+  if(!rf95.recv(rf_buf, &receivedLen)) {
     Serial.println("recv failed");
     return false;
   }
 
-  if(!Packet::isPacket(buf, receivedLen)) {
+  if(!Packet::isPacket(rf_buf, receivedLen)) {
     Serial.println("Can't deserialize packet");
     return false;
   }
 
-  Packet::deserialize(buf, target);
+  Packet::deserialize(rf_buf, target);
   return true;
 }
 
 void Radio::sendPacket(Packet &data) {
-  data.serialize(buf);
-  rf95.send(buf, data.size());
+  data.serialize(rf_buf);
+  rf95.send(rf_buf, data.size());
 
   // Wait until packet has sent maybe??
   rf95.waitPacketSent();
