@@ -30,7 +30,7 @@ EOF
   puts "Generated #{output_path}"
 end
 
-def generate_cpp(packet)
+def generate_files(packet)
   name = "serde"
   output_dir = Pathname.new("../src/generated")
 
