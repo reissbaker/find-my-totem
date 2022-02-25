@@ -1,8 +1,16 @@
 #include <RH_RF95.h>
 #include "./serde.h"
 
+uint8_t Packet::size() {
+  return sizeof(class Packet);
+}
+
 bool Packet::isPacket(uint8_t buf[], int len) {
   return len == sizeof(struct Packet) && buf[0] == <%= magic_byte %>;
+}
+
+Packet::Packet() {
+  this->magic_byte = <%= magic_byte %>;
 }
 
 Packet::Packet(PacketArgs args) {
@@ -52,15 +60,15 @@ void Packet::serialize(uint8_t buf[]) {
   <% end %>
 }
 
-Packet Packet::deserialize(uint8_t buf[]) {
+void Packet::deserialize(uint8_t buf[], Packet *target) {
   <% bytes_read = 1 %>
   <% fields.each do |field| %>
   <% case field.type
     when :byte %>
-      <%= field.type %> <%= field.name %> = buf[<%= bytes_read %>];
+      target-><%= field.name %> = buf[<%= bytes_read %>];
       <% bytes_written += 1 %>
     <% when :long %>
-      long <%= field.name %> = longFromBytes(
+      target-><%= field.name %> = longFromBytes(
         <% 0.upto(3).each do |offset| %>
           buf[<%= bytes_read + offset %>] <% if offset != 3 %>,<% end %>
         <% end %>
@@ -70,10 +78,4 @@ Packet Packet::deserialize(uint8_t buf[]) {
       <% raise "No known type #{field.type}" %>
     <% end %>
   <% end %>
-
-  return Packet(PacketArgs {
-    <% fields.each_with_index do |field, index| %>
-      .<%= field.name %> = <%= field.name %> <% if index != fields.length - 1 %>,<% end %>
-    <% end %>
-  });
 }

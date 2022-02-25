@@ -27,30 +27,25 @@ void setup() {
 }
 
 void loop() {
-  uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-
   Serial.print("ID: ");
   printId(randomIdPrefix, randomIdSuffix);
 
-  receivePacket(buf);
-  sendPacket(buf);
+  receivePacket();
+  sendPacket();
 }
 
 /**
  * Attempt to receive a packet
  * -------------------------------------------------------------------------------------------------
  */
-void receivePacket(uint8_t buf[]) {
-  uint8_t receivedLen;
+void receivePacket() {
+  Packet packet;
 
   Serial.println("Waiting for packets...");
   long waitTime = random(WAIT_MS_FLOOR, WAIT_MS_CEIL);
-  if(Radio::receiveBytes(buf, &receivedLen, waitTime)) {
-    if(Packet::isPacket(buf, receivedLen)) {
-      Packet packet = Packet::deserialize(buf);
-      Serial.print("Received ID: ");
-      printId(packet.id_prefix, packet.id_suffix);
-    }
+  if(Radio::receivePacket(waitTime, &packet)) {
+    Serial.print("Received ID: ");
+    printId(packet.id_prefix, packet.id_suffix);
   }
 }
 
@@ -58,15 +53,14 @@ void receivePacket(uint8_t buf[]) {
  * Send a packet
  * -------------------------------------------------------------------------------------------------
  */
-void sendPacket(uint8_t buf[]) {
+void sendPacket() {
   Packet packet = Packet(PacketArgs {
     .id_prefix = randomIdPrefix,
     .id_suffix = randomIdSuffix,
   });
 
   Serial.println("Sending packet...");
-  packet.serialize(buf);
-  Radio::sendBytes(buf, sizeof(packet));
+  Radio::sendPacket(packet);
 }
 
 void printId(long prefix, long suffix) {

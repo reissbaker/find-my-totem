@@ -7,8 +7,8 @@
 class Radio {
   public:
     static void init();
-    static bool receiveBytes(uint8_t buf[], uint8_t *receivedLen, long waitTime);
-    static void sendBytes(uint8_t buf[], uint8_t len);
+    static bool receivePacket(long waitTime, Packet *target);
+    static void sendPacket(Packet &data);
 };
 
 #endif

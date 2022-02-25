@@ -14,6 +14,9 @@
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
+// Singleton data buffer used by the radio driver
+uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+
 void Radio::init() {
   pinMode(RFM95_RST, OUTPUT);
   // Magic initial write copied from Adafruit example code
@@ -45,13 +48,18 @@ void Radio::init() {
   rf95.setTxPower(20);
 }
 
-bool Radio::receiveBytes(uint8_t buf[], uint8_t *receivedLen, long waitTime) {
+bool Radio::receivePacket(long waitTime, Packet *target) {
+  uint8_t receivedLen;
+
   if(rf95.waitAvailableTimeout(waitTime)) {
     Serial.println("Received packet");
-    if(rf95.recv(buf, receivedLen)) {
+    if(rf95.recv(buf, &receivedLen)) {
+      if(Packet::isPacket(buf, receivedLen)) {
+        Packet::deserialize(buf, target);
+        return true;
+      }
       Serial.print("RSSI: ");
       Serial.println(rf95.lastRssi(), DEC);
-      return true;
     }
     else {
       Serial.println("recv failed");
@@ -63,8 +71,9 @@ bool Radio::receiveBytes(uint8_t buf[], uint8_t *receivedLen, long waitTime) {
   return false;
 }
 
-void Radio::sendBytes(uint8_t buf[], uint8_t len) {
-  rf95.send(buf, len);
+void Radio::sendPacket(Packet &data) {
+  data.serialize(buf);
+  rf95.send(buf, data.size());
 
   // Wait until packet has sent maybe??
   rf95.waitPacketSent();

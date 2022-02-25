@@ -16,12 +16,14 @@ class Packet {
     <%= field.type %> <%= field.name %>;
   <% end %>
 
+  Packet();
   Packet(PacketArgs args);
 
   static bool isPacket(uint8_t buf[], int len);
-  static Packet deserialize(uint8_t buf[]);
+  static void deserialize(uint8_t buf[], Packet *target);
 
   void serialize(uint8_t buf[]);
+  uint8_t size();
 };
 
 
