@@ -22,7 +22,7 @@ WARNING: GENERATED CODE
 DO NOT MODIFY
 YOUR MODIFICATIONS WILL BE OVERWRITTEN
 
-Modify .#{template_path} rather than this file.
+Modify #{template_path} rather than this file.
 */
 EOF
   output = strip_whitespace(mod_warning + render_template(template, packet))
