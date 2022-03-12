@@ -47,7 +47,7 @@ void Radio::init() {
 }
 
 bool Radio::receivePacket(long waitTime, Packet *target) {
-  uint8_t receivedLen;
+  uint8_t receivedLen = sizeof(struct Packet);
 
   if(!rf95.waitAvailableTimeout(waitTime)) {
     Serial.println("No packets received within timeout");
