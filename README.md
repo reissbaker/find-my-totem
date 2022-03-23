@@ -31,8 +31,10 @@ You'll also need to make sure your Arduino IDE (or whatever Arduino toolchain yo
 up for the Adafruit Feather LoRa boards we use.
 [Follow the instructions here to add the boards.](https://learn.adafruit.com/adafruit-feather-m0-radio-with-lora-radio-module/setup)
 
-Finally, you'll need to install the radio library we use. Since C++ is the worst, of course you'll
+Finally, you'll need to install the libraries we use. Since C++ is the worst, of course you'll
 need to do this manually.
-[Follow the instructions here.](https://learn.adafruit.com/adafruit-feather-m0-radio-with-lora-radio-module/using-the-rfm-9x-radio)
+For the radio library, [follow the instructions here.](https://learn.adafruit.com/adafruit-feather-m0-radio-with-lora-radio-module/using-the-rfm-9x-radio)
+For the GPS, use the Arduino Library Manager to install the Adafruit GPS library. We originally
+built it with v1.5.4, but later versions may work too.
 
 Once you're all set up, this repo should build/upload/etc with ordinary Arduino tools.
