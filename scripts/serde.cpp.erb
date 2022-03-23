@@ -27,11 +27,26 @@ uint8_t byteFromLong(long num, int bytePosition) {
   return masked >> (bytePosition * 8);
 }
 
+uint8_t byteFromFloat(float fl, int bytePosition) {
+  uint32_t *num = reinterpret_cast<uint32_t*>(&fl);
+  long mask = 0xFF << (bytePosition * 8);
+  long masked = *num & mask;
+  return masked >> (bytePosition * 8);
+}
+
 long longFromBytes(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
   return (byte3 << (3 * 8))
        | (byte2 << (2 * 8))
        | (byte1 << (1 * 8))
        | byte0;
+}
+
+float floatFromBytes(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
+  uint32_t bytes = (byte3 << (3 * 8))
+                 | (byte2 << (2 * 8))
+                 | (byte1 << (1 * 8))
+                 | byte0;
+  return *((float *) &bytes);
 }
 
 void Packet::serialize(uint8_t buf[]) {
@@ -43,9 +58,17 @@ void Packet::serialize(uint8_t buf[]) {
     when :byte %>
       buf[<%= bytes_written %>] = this-><%= field.name %>;
       <% bytes_written += 1 %>
+    <% when :bool %>
+      buf[<%= bytes_written %>] = this-><%= field.name %>;
+      <% bytes_written += 1 %>
     <% when :long %>
       <% 0.upto(3).each do |offset| %>
         buf[<%= bytes_written + offset %>] = byteFromLong(this-><%= field.name %>, <%= offset %>);
+      <% end %>
+      <% bytes_written += 4 %>
+    <% when :float %>
+      <% 0.upto(3).each do |offset| %>
+        buf[<%= bytes_written + offset %>] = byteFromFloat(this-><%= field.name %>, <%= offset %>);
       <% end %>
       <% bytes_written += 4 %>
     <% else %>
@@ -61,8 +84,18 @@ void Packet::deserialize(uint8_t buf[], Packet *target) {
     when :byte %>
       target-><%= field.name %> = buf[<%= bytes_read %>];
       <% bytes_written += 1 %>
+    <% when :bool %>
+      target-><%= field.name %> = buf[<%= bytes_read %>];
+      <% bytes_written += 1 %>
     <% when :long %>
       target-><%= field.name %> = longFromBytes(
+        <% 0.upto(3).each do |offset| %>
+          buf[<%= bytes_read + offset %>] <% if offset != 3 %>,<% end %>
+        <% end %>
+      );
+      <% bytes_read += 4 %>
+    <% when :float %>
+      target-><%= field.name %> = floatFromBytes(
         <% 0.upto(3).each do |offset| %>
           buf[<%= bytes_read + offset %>] <% if offset != 3 %>,<% end %>
         <% end %>

@@ -8,7 +8,7 @@ class FieldDef
   end
 end
 
-types = [ :byte, :long ]
+TYPES = [ :byte, :long, :float, :bool ]
 
 class Packet
   def initialize
@@ -32,7 +32,7 @@ class Packet
   end
 end
 
-types.each do |type|
+TYPES.each do |type|
   Packet.define_method(type) do |name|
     @fields << FieldDef.new(name, type)
   end
